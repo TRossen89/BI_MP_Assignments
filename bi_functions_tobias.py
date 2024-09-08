@@ -1,10 +1,15 @@
 import pandas as pd
 
-def calculate_outliers (data_frame, df, *columns):
+def calculate_outliers (data_frame, df, exclude_columns, *columns):
 
 
     categorical_columns = data_frame.select_dtypes(include=['object', 'category']).columns
-    categorical_columns_list = categorical_columns.tolist()
+    columns_to_exclude = categorical_columns.tolist()
+
+    
+    if exclude_columns == True:
+        for col in columns:
+            columns_to_exclude.append(col)
     
 
     column_names = []
@@ -16,14 +21,18 @@ def calculate_outliers (data_frame, df, *columns):
     total_number_of_outliers = 0
 
     
-    if len(columns) == 0:
-        print("no column args chosen")
+    if len(columns) == 0 or exclude_columns == True:
+        if len(columns) == 0:
+            print("No column arguments chosen. Outliers for all columns with numerical values are calculated")
+        if exclude_columns == True: 
+            print("No outliers calculated for the column arguments") 
 
-        column_names = list(data_frame.drop(columns = categorical_columns).columns)    
+        column_names = list(data_frame.drop(columns = columns_to_exclude).columns)    
 
 
     else:
         column_names = columns
+        print("Outliers only calculated for the column arguments")
 
         
     for column_name in column_names:
@@ -63,3 +72,7 @@ def calculate_outliers (data_frame, df, *columns):
     dic_of_data_to_return["total_number_of_outliers"] = total_number_of_outliers 
 
     return dic_of_data_to_return
+
+
+
+
