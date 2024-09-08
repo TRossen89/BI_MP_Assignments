@@ -1,11 +1,9 @@
 import pandas as pd
 
-def calculate_outliers (data_frame, df, exclude_columns, *columns):
-
+def calculate_outliers (data_frame, df = True, exclude_columns = False, remove_outliers=False, *columns):
 
     categorical_columns = data_frame.select_dtypes(include=['object', 'category']).columns
     columns_to_exclude = categorical_columns.tolist()
-
     
     if exclude_columns == True:
         for col in columns:
@@ -16,9 +14,15 @@ def calculate_outliers (data_frame, df, exclude_columns, *columns):
     
     dic_of_data_to_return = {}
 
-    df_without_outliers = data_frame.copy()
+    #df_without_outliers = data_frame.copy()
+    df_to_calculate_on = data_frame.copy()
+    
+    #df_without_outliers['ID'] = range(1, len(df_without_outliers) + 1)
+    df_to_calculate_on['ID'] = range(1, len(df_to_calculate_on) + 1)
 
     total_number_of_outliers = 0
+    total_number_of_rows_deleted_in_data_frame_returned = 0
+    
 
     
     if len(columns) == 0 or exclude_columns == True:
@@ -34,41 +38,54 @@ def calculate_outliers (data_frame, df, exclude_columns, *columns):
         column_names = columns
         print("Outliers only calculated for the column arguments")
 
+
+    ids_to_delete = []
         
     for column_name in column_names:
         
-        Q1 = df_without_outliers[f"{column_name}"].quantile(0.25)
+        Q1 = df_to_calculate_on[f"{column_name}"].quantile(0.25)
         
-        Q3 = df_without_outliers[f"{column_name}"].quantile(0.75)
+        Q3 = df_to_calculate_on[f"{column_name}"].quantile(0.75)
         
         IQR = Q3-Q1
         
         Lower_Fence = Q1 - (1.5*IQR)
         Upper_Fence = Q3 + (1.5*IQR)
         
-        outliers_condition = (df_without_outliers[f"{column_name}"]< Lower_Fence) | (df_without_outliers[f"{column_name}"] > Upper_Fence)
+        outliers_condition = (df_to_calculate_on[f"{column_name}"]< Lower_Fence) | (df_to_calculate_on[f"{column_name}"] > Upper_Fence)
 
-        outliers_df = pd.DataFrame(df_without_outliers[outliers_condition])
-        
-        df_without_outliers = df_without_outliers[~outliers_condition]
-        
-        
-        
+        outliers_df = pd.DataFrame(df_to_calculate_on[outliers_condition])
+    
         number_of_outliers = outliers_df.shape[0]
 
+        
+        for id in outliers_df["ID"].tolist():
+            
+            ids_to_delete.append(id)
+
+        
+            
         total_number_of_outliers += number_of_outliers
+        total_number_of_rows_deleted_in_data_frame_returned += outliers_df.shape[0]
         
         print(f"Number of outliers in {column_name}: " + str(number_of_outliers))
         
         dic_of_data_to_return[column_name] = {"number_of_outliers": number_of_outliers, "outliers": outliers_df}
+        
 
-
-    print("Total number of outliers: " + str(total_number_of_outliers)) 
+    if remove_outliers == True:
+        data_frame['ID'] = range(1, len(data_frame) + 1)
+        data_frame = data_frame[~data_frame['ID'].isin(ids_to_delete)]
+        
     
-    if df == True:
-        return df_without_outliers
+    print("Total number of outliers: " + str(total_number_of_outliers)) 
+    print("Total number of rows deleted in returned data frame: " + str(total_number_of_rows_deleted_in_data_frame_returned))
+ 
+    
+    if df == True and remove_outliers == True:
+        return data_frame
 
-    dic_of_data_to_return["df_without_outliers"] = df_without_outliers 
+    dic_of_data_to_return["df_without_outliers"] = data_frame
     dic_of_data_to_return["total_number_of_outliers"] = total_number_of_outliers 
 
     return dic_of_data_to_return
