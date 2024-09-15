@@ -1,6 +1,6 @@
 import pandas as pd
 
-def calculate_outliers (data_frame, df = True, exclude_columns = False, remove_outliers=False, *columns):
+def calculate_outliers (data_frame, df = True, exclude_columns = False, remove_outliers=False, multiply_value = 1.5, *columns):
 
     categorical_columns = data_frame.select_dtypes(include=['object', 'category']).columns
     columns_to_exclude = categorical_columns.tolist()
@@ -39,7 +39,7 @@ def calculate_outliers (data_frame, df = True, exclude_columns = False, remove_o
         print("Outliers only calculated for the column arguments")
 
 
-    ids_to_delete = []
+    ids_to_delete = set()
         
     for column_name in column_names:
         
@@ -49,8 +49,8 @@ def calculate_outliers (data_frame, df = True, exclude_columns = False, remove_o
         
         IQR = Q3-Q1
         
-        Lower_Fence = Q1 - (1.5*IQR)
-        Upper_Fence = Q3 + (1.5*IQR)
+        Lower_Fence = Q1 - (multiply_value*IQR)
+        Upper_Fence = Q3 + (multiply_value*IQR)
         
         outliers_condition = (df_to_calculate_on[f"{column_name}"]< Lower_Fence) | (df_to_calculate_on[f"{column_name}"] > Upper_Fence)
 
@@ -61,12 +61,12 @@ def calculate_outliers (data_frame, df = True, exclude_columns = False, remove_o
         
         for id in outliers_df["ID"].tolist():
             
-            ids_to_delete.append(id)
+            ids_to_delete.add(id)
 
         
             
         total_number_of_outliers += number_of_outliers
-        total_number_of_rows_deleted_in_data_frame_returned += outliers_df.shape[0]
+
         
         print(f"Number of outliers in {column_name}: " + str(number_of_outliers))
         
@@ -76,11 +76,12 @@ def calculate_outliers (data_frame, df = True, exclude_columns = False, remove_o
     if remove_outliers == True:
         data_frame['ID'] = range(1, len(data_frame) + 1)
         data_frame = data_frame[~data_frame['ID'].isin(ids_to_delete)]
-        
+        print("Total number of rows deleted in returned data frame: " + str(len(ids_to_delete)))
+    else:
+        print("No outliers deleted ")
     
-    print("Total number of outliers: " + str(total_number_of_outliers)) 
-    print("Total number of rows deleted in returned data frame: " + str(total_number_of_rows_deleted_in_data_frame_returned))
- 
+    print("Total number of outliers (if there is more outliers than deleted rows it means that some rows contain outliers in more than one column): " + str(total_number_of_outliers)) 
+    
     
     if df == True and remove_outliers == True:
         return data_frame
