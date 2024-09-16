@@ -1,9 +1,56 @@
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from scipy.stats import pearsonr
+from scipy.stats import shapiro
+from sklearn import metrics
+import numpy as np
 
-def calculate_outliers (data_frame, df = True, exclude_columns = False, remove_outliers=False, multiply_value = 1.5, *columns):
+def train_linear_model(data_frame, target, features):  
 
+    df = data_frame.copy()
+    
+    model = LinearRegression()
+
+    X = df[features]
+    y = df[target]
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+    
+    
+    model.fit(X_train, y_train)
+    
+    pred = model.predict(X_test)
+    
+    metrics_df = pd.DataFrame({'Metric': ['MAE', 
+                                          'MSE', 
+                                          'RMSE',
+                                           'Explained Variance',
+                                          'R-Squared'],
+                              'Value': [metrics.mean_absolute_error(y_test, pred),
+                                        metrics.mean_squared_error(y_test, pred),
+                                        np.sqrt(metrics.mean_squared_error(y_test, pred)),
+                                        metrics.explained_variance_score(y_test, pred),
+                                       metrics.r2_score(y_test, pred)]}).round(3)
+    
+    
+    # Format the 'Value' column to display with 3 decimals
+    metrics_df['Value'] = metrics_df['Value'].apply(lambda x: f'{x:.3f}')
+    
+    print(metrics_df)  
+
+    return model
+
+
+
+
+def calculate_outliers (df_passed, df = True, exclude_columns = False, remove_outliers=False, multiply_value = 1.5, *columns):
+
+    data_frame = df_passed.copy()
+    
     categorical_columns = data_frame.select_dtypes(include=['object', 'category']).columns
     columns_to_exclude = categorical_columns.tolist()
+
     
     if exclude_columns == True:
         for col in columns:
