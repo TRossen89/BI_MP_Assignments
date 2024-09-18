@@ -3,21 +3,60 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from scipy.stats import pearsonr
 from scipy.stats import shapiro
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn import metrics
 import numpy as np
+from sklearn.pipeline import make_pipeline
 
-def train_linear_model(data_frame, target, features):  
+def train_linear_model_xy(X_train, X_test, y_train, y_test):
+    
+    model = LinearRegression()
+        
+    model.fit(X_train, y_train)
+    
+    pred = model.predict(X_test)
+    
+    metrics_df = pd.DataFrame({'Metric': ['MAE', 
+                                          'MSE', 
+                                          'RMSE',
+                                           'Explained Variance',
+                                          'R-Squared'],
+                              'Value': [metrics.mean_absolute_error(y_test, pred),
+                                        metrics.mean_squared_error(y_test, pred),
+                                        np.sqrt(metrics.mean_squared_error(y_test, pred)),
+                                        metrics.explained_variance_score(y_test, pred),
+                                       metrics.r2_score(y_test, pred)]}).round(3)
+    
+    
+    # Format the 'Value' column to display with 3 decimals
+    metrics_df['Value'] = metrics_df['Value'].apply(lambda x: f'{x:.3f}')
+    
+    print(metrics_df)  
+
+    return model
+    
+
+def train_linear_model(data_frame, target, features, polynomial):  
 
     df = data_frame.copy()
     
-    model = LinearRegression()
-
+    
+        
     X = df[features]
     y = df[target]
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42)
+
     
-    
+    if polynomial == True:
+        
+        poly = PolynomialFeatures(degree=2, include_bias=False)
+
+        model = make_pipeline(poly, LinearRegression())
+    else:
+        model = LinearRegression()
+
+
     model.fit(X_train, y_train)
     
     pred = model.predict(X_test)
