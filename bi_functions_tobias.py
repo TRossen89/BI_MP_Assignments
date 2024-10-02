@@ -36,7 +36,7 @@ def train_linear_model_xy(X_train, X_test, y_train, y_test):
     return model
     
 
-def train_linear_model(data_frame, target, features, polynomial):  
+def train_linear_model(data_frame, target, features, polynomial, poly_degree = 2):  
 
     df = data_frame.copy()
     
@@ -50,7 +50,7 @@ def train_linear_model(data_frame, target, features, polynomial):
     
     if polynomial == True:
         
-        poly = PolynomialFeatures(degree=2, include_bias=False)
+        poly = PolynomialFeatures(degree=poly_degree, include_bias=False)
 
         model = make_pipeline(poly, LinearRegression())
     else:
@@ -166,7 +166,7 @@ def calculate_outliers (df_passed, df = True, exclude_columns = False, remove_ou
     else:
         print("No outliers deleted ")
     
-    print("Total number of outliers (if there is more outliers than deleted rows it means that some rows contain outliers in more than one column): " + str(total_number_of_outliers)) 
+    print("Total number of outliers (if there are more outliers than deleted rows, it means that some rows contain outliers in more than one column): " + str(total_number_of_outliers)) 
     
     
     if df == True and remove_outliers == True:
