@@ -16,7 +16,7 @@ My confusion matrices didn't match the accuracy score. As far as I can tell it's
 ---
 - Which are the most decisive factors for quitting a job?
 
-From the correlation matrix it seems to be working overtime, being single and number of total working years. Working overtime, being single and not having worked that many years will make a little
+From the correlation matrix it seems to be working overtime, being single and number of total working years. Working overtime, being single and not having worked that many years will make it a little
 more likely that an employee quits her job
 
 ---
