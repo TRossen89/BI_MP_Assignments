@@ -1,4 +1,56 @@
 # MP_BI_Tobias
+
+## MP4:
+
+- Which machine learning methods did you choose to apply in the application?
+
+I used Decistion Tree (with different n_components), Naive Bayes, Random Forest for classification (Supervised training) and a KMeans method for clustering (Unsupervised training).
+
+---
+- How accurate is your solution of prediction?
+
+All my classification models had an accuracy score around 8.2 - 8.5. Neither seemed to be significantly better than the other, although the models where only 3-4 features where included instead of almost all the features, were generally scoring around 8.4 - 8.5. Also the Random Forest model had a high score of around 8.5. 
+
+My confusion matrices didn't match the accuracy score. As far as I can tell it's because of the class imbalance in the Attrition feature. 
+
+---
+- Which are the most decisive factors for quitting a job?
+
+From the correlation matrix it seems to be working overtime, being single and number of total working years. Working overtime, being single and not having worked that many years will make a little
+more likely that an employee quits her job
+
+---
+- Which work positions and departments are in higher risk of losing employees?
+
+From the correlation matrix it seems to be the position as Sales Representative and the Sales Department which are in higher risk of losing employees
+
+
+---
+- Are employees of different gender paid equally in all departments?
+
+??? [Didn't have time to investigate this]
+
+---
+- Do the family status and the distance from work influence the work-life balance?
+
+??? [Didn't have time to investigate this. The correlation matrix might say a little about this]
+
+---
+  
+- Does education make people happy (satisfied from the work)?
+
+??? [Didn't have time to investigate this. The correlation matrix might say a little about this]
+
+---
+- Which were the challenges in the project development?
+
+It took me a long time to find out why the accuracy scores and the confusion matrices didn't match and I'm not totally sure the class imbalance is the reason why.
+I'm unsure about all the models I've used
+  
+
+---
+---
+---
 ---
 ## MP3:  
 
